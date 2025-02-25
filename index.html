@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estoque T.I - HSL</title>
+    <link rel="stylesheet" href="estilo.css" />
+  </head>
+  <link rel="icon" href="imagens/siriolibanes.png" />
+  <body background="imagens/estoquetiia.jpg">
+    <header>
+        <div class="header-content">
+            <div style="display: flex; align-items: center;">
+                <img src="imagens/siriolibanes.png" alt="Logo HSL" class="header-logo">
+                <h1 class="header-title">Sistema de Controle de Estoque T.I</h1>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="usuario-logado">Admin</span>
+                <button onclick="logout()" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+        <div class="system-status">
+            <span class="status-item">
+                <i class="fas fa-database"></i>
+                Total de Itens: <span id="total-items">0</span>
+            </span>
+            <span class="status-item">
+                <i class="fas fa-exclamation-triangle"></i>
+                Itens Críticos: <span id="items-criticos">0</span>
+            </span>
+            <span class="status-item">
+                <i class="fas fa-clock"></i>
+                Última Atualização: <span id="ultima-atualizacao">--:--</span>
+            </span>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="dashboard-summary">
+            <div class="summary-card">
+                <i class="fas fa-boxes"></i>
+                <h3>Total em Estoque</h3>
+                <p id="total-produtos">0</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-exchange-alt"></i>
+                <h3>Movimentações Hoje</h3>
+                <p id="movimentacoes-hoje">0</p>
+            </div>
+            <div class="summary-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Tendência</h3>
+                <p id="tendencia">Estável</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('cadastro')">
+                <i class="fas fa-box"></i> Cadastro
+            </button>
+            <button class="tab-button" onclick="showTab('movimentacao')">
+                <i class="fas fa-exchange-alt"></i> Movimentação
+            </button>
+            <button class="tab-button" onclick="showTab('consulta')">
+                <i class="fas fa-search"></i> Consulta
+            </button>
+            <button class="tab-button" onclick="showTab('relatorios')">
+                <i class="fas fa-chart-bar"></i> Relatórios
+            </button>
+        </div>
+
+        <div id="cadastro" class="tab-content active">
+            <div class="card">
+                <h2><i class="fas fa-box"></i> Registrar Produto</h2>
+                <form id="produto-form">
+                    <input type="text" id="nome" placeholder="Nome do Produto" required />
+                    <input type="text" id="categoria" placeholder="Categoria" required />
+                    <input type="text" id="marca" placeholder="Marca" required />
+                    <input type="text" id="serie" placeholder="Número de Série" required />
+                    <input
+                        type="number"
+                        id="quantidade"
+                        placeholder="Quantidade"
+                        min="0"
+                        required
+                    />
+                    <button type="submit">Adicionar Produto</button>
+                </form>
+                <div id="mensagem-produto" class="mensagem"></div>
+            </div>
+        </div>
+
+        <div id="movimentacao" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-exchange-alt"></i> Registrar Entrada/Saída</h2>
+                <form id="movimentacao-form">
+                    <input
+                        type="text"
+                        id="usuario"
+                        placeholder="Nome do Usuário"
+                        required
+                    />
+                    <input
+                        type="text"
+                        id="produto"
+                        placeholder="Nome do Produto"
+                        required
+                    />
+                    <input
+                        type="text"
+                        id="serie-mov"
+                        placeholder="Número de Série"
+                        required
+                    />
+
+                    <input 
+                        type="text" 
+                        id="chamado" 
+                        placeholder="Número do chamado ou motivo">
+
+                    <input
+                        type="number"
+                        id="quantidade-mov"
+                        placeholder="Quantidade"
+                        min="1"
+                        required
+                    />
+                    <select id="tipo-mov">
+                        <option value="entrada">Entrada</option>
+                        <option value="saida">Saída</option>
+                    </select>
+                    <button type="submit">Registrar Movimentação</button>
+                </form>
+                <div id="mensagem-movimentacao" class="mensagem"></div>
+            </div>
+        </div>
+
+        <div id="consulta" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-search"></i> Consulta de Estoque</h2>
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="busca-produto" placeholder="Buscar produto..." onkeyup="filtrarProdutos()">
+                    </div>
+                    <div class="advanced-search">
+                        <input type="text" id="busca-quantidade" placeholder="Nome do produto">
+                        <input type="text" id="busca-categoria" placeholder="Categoria">
+                        <button onclick="exibirQuantidadePorNomeECategoria()" class="search-btn">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+                <p id="resultado-quantidade"></p>
+                
+                <button onclick="exportarProdutosCSV()">
+                    Exportar Produtos para CSV
+                </button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Marca</th>
+                            <th>Número de Série</th>
+                            <th>Quantidade</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-produtos"></tbody>
+                </table>
+
+                <p id="total-produtos">Total em estoque</p>
+                <h2>Movimentações</h2>
+                <select id="filtro-movimentacao" onchange="filtrarMovimentacoes()">
+                    <option value="todos">Todos</option>
+                    <option value="entrada">Entradas</option>
+                    <option value="saida">Saídas</option>
+                </select>
+                <button onclick="exportarDados('csv')">Exportar para CSV</button>
+                <button onclick="exportarDados('json')">Exportar para JSON</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Produto</th>
+                            <th>Número de Série</th>
+                            <th>Quantidade</th>
+                            <th>Tipo</th>
+                            <th>Chamado</th>
+                            <th>Data/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-movimentacoes"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="relatorios" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-chart-bar"></i> Relatórios e Análises</h2>
+                <div class="report-options">
+                    <button onclick="gerarRelatorio('diario')">Relatório Diário</button>
+                    <button onclick="gerarRelatorio('mensal')">Relatório Mensal</button>
+                    <button onclick="gerarRelatorio('criticos')">Itens Críticos</button>
+                    <button onclick="exportarDados('csv')">Exportar CSV</button>
+                    <button onclick="exportarDados('json')">Exportar JSON</button>
+                </div>
+                <div id="grafico-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Hospital Sírio-Libanês - Sistema de Controle de Estoque T.I</p>
+        <p>Versão 2.0</p>
+    </footer>
+
+    <script src="https://kit.fontawesome.com/your-code.js"></script>
+    <script src="interacao.js"></script>
+  </body>
+</html>
